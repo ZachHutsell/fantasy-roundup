@@ -1,7 +1,8 @@
 {
   "name": "fantasy-roundup",
   "version": "1.0.0",
-  "description": "Run 'npm run load 2' to populate data for week 2",
+  "type": "module",
+  "description": "Run 'npm run load 2024 2' to populate data for week 2 of 2024 season",
   "main": "load.js",
   "scripts": {
     "load": "node load.js"
