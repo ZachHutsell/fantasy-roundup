@@ -1,0 +1,16 @@
+{
+  "name": "fantasy-roundup",
+  "version": "1.0.0",
+  "description": "Run 'npm run load 2' to populate data for week 2",
+  "main": "load.js",
+  "scripts": {
+    "load": "node load.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "lodash": "^4.17.21",
+    "sqlite3": "^5.1.7"
+  }
+}
