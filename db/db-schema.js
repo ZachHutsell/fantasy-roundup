@@ -9,6 +9,17 @@ let db = new sqlite3.Database(constants.DB_PATH, (err) => {
 });
 
 db.serialize(() => {
+  //teams
+  db.run(`
+    CREATE TABLE IF NOT EXISTS teams (
+      id INTEGER PRIMARY KEY,
+      season INTEGER,
+      name text,
+      points_for INTEGER,
+      points_against INTEGER
+    );
+  `);
+
   //games
   db.run(`
     CREATE TABLE IF NOT EXISTS games (
@@ -27,5 +38,5 @@ db.close((err) => {
   if (err) {
     console.error(err.message);
   }
-  console.log('Database setup complete.');
+  console.log("Database setup complete.");
 });

@@ -6,7 +6,8 @@
   "main": "load.js",
   "scripts": {
     "setup": "node ./db/db-schema.js",
-    "load": "node load.js"
+    "load": "node load.js",
+    "all": "node ./db/db-schema.js && node load.js 2024 1"
   },
   "author": "",
   "license": "ISC",
