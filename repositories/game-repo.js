@@ -5,7 +5,7 @@ import {
   getCloseDbPromise,
 } from "../db/db-utils.js";
 
-export default class GameRepo {
+class GameRepo {
   constructor() {}
 
   async findByWeek(season, week) {
@@ -59,3 +59,7 @@ export default class GameRepo {
     );
   }
 }
+
+const repo = new GameRepo();
+
+export default repo;

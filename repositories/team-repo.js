@@ -4,8 +4,7 @@ import {
   getCloseDbPromise,
 } from "../db/db-utils.js";
 import Team from "../models/team.js";
-
-export default class TeamRepo {
+ class TeamRepo {
   constructor() {}
 
   async findBySeason(season) {
@@ -43,3 +42,7 @@ export default class TeamRepo {
     return new Team(row.id, row.season, row.name, row.points_for, row.points_against);
   }
 }
+
+const repo = new TeamRepo();
+
+export default repo;

@@ -5,7 +5,7 @@ let db = new sqlite3.Database(constants.DB_PATH, (err) => {
   if (err) {
     console.error(err);
   }
-  console.log(`Connected to ${constants.DB_NAME}.`);
+  console.log(`Connected to ${constants.DB_PATH}.`);
 });
 
 db.serialize(() => {
@@ -30,6 +30,24 @@ db.serialize(() => {
       home_team INTEGER,
       away_score REAL,
       home_score REAL
+    );
+  `);
+
+  //player_performances
+  db.run(`
+    CREATE TABLE IF NOT EXISTS player_performances (
+      game_id INTEGER,
+      player_id INTEGER,
+      team_id INTEGER,
+      starter BOOLEAN,
+      player_name TEXT,
+      position TEXT,
+      pro_team TEXT,
+      points REAL,
+      stats TEXT,
+      PRIMARY KEY (game_id, player_id),
+      FOREIGN KEY (game_id) REFERENCES games(id),
+      FOREIGN KEY (team_id) REFERENCES teams(id)
     );
   `);
 });
