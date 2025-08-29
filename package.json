@@ -7,7 +7,7 @@
   "scripts": {
     "setup": "node ./db/db-schema.js",
     "load": "node load.js",
-    "all": "node ./db/db-schema.js && node load.js"
+    "all": "rm ./db/fantasy.sqlite && node ./db/db-schema.js && node load.js"
   },
   "author": "",
   "license": "ISC",

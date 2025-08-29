@@ -7,29 +7,24 @@ import teamRepo from "./repositories/team-repo.js";
 import playerPerformanceRepo from "./repositories/player-performance-repo.js";
 import fleaflickerApi from "./api/fleaflicker-api.js";
 
-const weeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+const weeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 async function main() {
   const season = process.argv[2];
-  const week = process.argv[3];
-  if (week) {
+
+  if (process.argv[3]) {
+    await loadAll(season, process.argv[3]);
   } else {
-    for (const theWeek of weeks) {
-      await loadTeamsToDb(season);
-      await loadGamesToDb(season, theWeek);
-      await loadPlayerPerformancesToDb(season, theWeek);
+    for (const week of weeks) {
+      await loadAll(season, week);
     }
   }
 }
 
-async function loadGamesToDb(season, week) {
-  const existingGames = await gameRepo.findByWeek(season, week);
-  if (gamesLoadedForWeek(existingGames)) {
-    console.log(`Games already loaded for season ${season} week ${week}`);
-    return;
-  }
-  const games = await fleaflickerApi.fetchGames(season, week);
-  await gameRepo.batchInsert(games);
+async function loadAll(season, week) {
+  await loadTeamsToDb(season);
+  await loadGamesToDb(season, week);
+  await loadPlayerPerformancesToDb(season, week);
 }
 
 async function loadTeamsToDb(season) {
@@ -42,6 +37,16 @@ async function loadTeamsToDb(season) {
   await teamRepo.batchInsert(teams);
 }
 
+async function loadGamesToDb(season, week) {
+  const existingGames = await gameRepo.findByWeek(season, week);
+  if (gamesLoadedForWeek(existingGames)) {
+    console.log(`Games already loaded for season ${season} week ${week}`);
+    return;
+  }
+  const games = await fleaflickerApi.fetchGames(season, week);
+  await gameRepo.batchInsert(games);
+}
+
 async function loadPlayerPerformancesToDb(season, week) {
   const games = await gameRepo.findByWeek(season, week);
   if (!gamesLoadedForWeek(games)) {
@@ -52,7 +57,7 @@ async function loadPlayerPerformancesToDb(season, week) {
   const gameIds = games.map((game) => game.id);
   for (const gameId of gameIds) {
     const existingPerformances = await playerPerformanceRepo.findByGame(gameId);
-    if (existingPerformances.length >= 32) {
+    if (existingPerformances.length > 0) {
       console.log(`Performances already loaded for game ${gameId}`);
     } else {
       const perfs = await fleaflickerApi.fetchPlayerPerformances(gameId);

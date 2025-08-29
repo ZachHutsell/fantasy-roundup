@@ -21,7 +21,6 @@ class GameRepo {
 
   async batchInsert(games) {
     const db = await getDbPromise();
-
     await db.serialize(() => {
       const stmt = db.prepare(
         "INSERT INTO games (id, season, week, away_team, home_team, away_score, home_score) VALUES (?, ?, ?, ?, ?, ?, ?)"

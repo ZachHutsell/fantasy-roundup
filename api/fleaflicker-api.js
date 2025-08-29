@@ -77,21 +77,46 @@ async function fetch(url) {
 }
 
 function createPlayerPerformance(slot, gameId, teamType, starter) {
-  if (slot.position.label === "IR") {
+  try {
+    if (shouldSkipProcessing(slot, teamType)) {
+      return null;
+    }
+    const player = slot[teamType];
+    return new PlayerPerformance(
+      gameId,
+      player.proPlayer.id,
+      player.owner.id,
+      starter,
+      player.proPlayer.nameShort,
+      player.proPlayer.position,
+      player.proPlayer.proTeamAbbreviation,
+      player.viewingActualPoints.value,
+      JSON.stringify(player.viewingActualStats)
+    );
+  } catch (err) {
+    console.error(`Issue processing API request: \n ${err.message} \n ${JSON.stringify(slot)}`);
     return null;
   }
-  const player = slot[teamType];
-  return new PlayerPerformance(
-    gameId,
-    player.proPlayer.id,
-    player.owner.id,
-    starter,
-    player.proPlayer.nameShort,
-    player.proPlayer.position,
-    player.proPlayer.proTeamAbbreviation,
-    player.viewingActualPoints.value,
-    JSON.stringify(player.viewingActualStats)
-  );
+}
+
+function shouldSkipProcessing(slot, teamType) {
+  const isInjuredReserve = slot.position.label === "IR";
+  if (isInjuredReserve) {
+    return true;
+  }
+  const player = slot[teamType],
+    proTeam = player.proPlayer.proTeamAbbreviation,
+    isPlayerFreeAgent = proTeam === "FA"
+
+    if(isPlayerFreeAgent) {
+      return true;
+    }
+    const isPlayerBye = player.requestedGames[0].isBye;
+    if( isPlayerBye) {
+      return true;
+    }
+
+  return false;
 }
 
 const api = new FleaflickerApi();

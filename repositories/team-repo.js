@@ -15,7 +15,7 @@ import Team from "../models/team.js";
       [season]
     );
     await getCloseDbPromise(db);
-    return rows.map(this.mapRow);
+    return rows.map(mapRow);
   }
 
   async batchInsert(teams) {
@@ -37,11 +37,11 @@ import Team from "../models/team.js";
 
     await getCloseDbPromise(db);
   }
+}
 
-  mapRow(row) {
+  function mapRow(row) {
     return new Team(row.id, row.season, row.name, row.points_for, row.points_against);
   }
-}
 
 const repo = new TeamRepo();
 
