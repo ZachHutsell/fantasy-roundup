@@ -4,27 +4,66 @@
 import _ from "lodash";
 import gameRepo from "./repositories/game-repo.js";
 import teamRepo from "./repositories/team-repo.js";
+import playerRepo from "./repositories/player-repo.js";
 import playerPerformanceRepo from "./repositories/player-performance-repo.js";
 import fleaflickerApi from "./api/fleaflicker-api.js";
 
 const weeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
-async function main() {
-  const season = process.argv[2];
+const args = {
+  func: {
+    index: 2,
+    vals: {
+      loadPlayers: "PLAYERS",
+      loadTeams: "TEAMS",
+      loadWeekly: "WEEK",
+    },
+  },
+  season: {
+    index: 3,
+  },
+  week: {
+    index: 4,
+  },
+};
 
-  if (process.argv[3]) {
-    await loadAll(season, process.argv[3]);
-  } else {
-    for (const week of weeks) {
-      await loadAll(season, week);
-    }
+async function main() {
+  const func = process.argv[args.func.index],
+    season = process.argv[args.season.index],
+    week = process.argv[args.week.index];
+
+  switch (func) {
+    case args.func.vals.loadPlayers:
+      await loadPlayersToDb();
+      break;
+    case args.func.vals.loadTeams:
+      if(!season) {
+        console.error('Cannot load teams without season');
+        break;
+      }
+      await loadTeamsToDb(season);
+      break;
+    case args.func.vals.loadWeekly:
+      if(!(season && week)) {
+        console.error('Cannot load games without season and week');
+        break;
+      }
+      await loadWeekly(season, week);
+      break;
+    default:
+      console.warn(`No function found for ${func}`);
   }
 }
 
-async function loadAll(season, week) {
-  await loadTeamsToDb(season);
+async function loadWeekly(season, week) {
   await loadGamesToDb(season, week);
   await loadPlayerPerformancesToDb(season, week);
+}
+
+//WARNING, THIS WILL CLEAR PLAYERS TABLE AND RELOAD IT!
+async function loadPlayersToDb() {
+  const players = await fleaflickerApi.fetchPlayers();
+  await playerRepo.clearAndBatchInsert(players);
 }
 
 async function loadTeamsToDb(season) {

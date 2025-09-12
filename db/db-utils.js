@@ -36,4 +36,15 @@ function getCloseDbPromise(db) {
   });
 }
 
-export { getDbPromise, getAllPromise,  getCloseDbPromise};
+function getRunPromise(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(this);
+    });
+  });
+}
+
+export { getDbPromise, getAllPromise, getCloseDbPromise, getRunPromise };

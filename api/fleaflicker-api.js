@@ -3,6 +3,7 @@ import constants from "../constants.js";
 import Game from "../models/game.js";
 import Team from "../models/team.js";
 import PlayerPerformance from "../models/player-performance.js";
+import Player from "../models/player.js";
 
 class FleaflickerApi {
   constructor() {}
@@ -37,8 +38,38 @@ class FleaflickerApi {
     });
   }
 
+  async fetchPlayers(pageLimit) {
+    let resultOffset = 0,
+      pageCount = 0,
+      players = [];
+
+    while (
+      resultOffset != null &&
+      (pageLimit == null || pageCount < pageLimit)
+    ) {
+      const url = `https://www.fleaflicker.com/api/FetchPlayerListing?sport=NFL&league_id=${constants.LEAGUE_ID}&external_id_type=SPORTRADAR&result_offset=${resultOffset}`;
+      const data = await fetch(url);
+
+      resultOffset = data.resultOffsetNext;
+      pageCount++;
+
+      data.players.forEach((player) => {
+        const pp = player.proPlayer;
+        players.push(
+          new Player(
+            pp.id,
+            pp.nameShort,
+            pp.position,
+            pp.proTeamAbbreviation,
+            pp.externalIds ? pp.externalIds[0].id : null
+          )
+        );
+      });
+    }
+    return players;
+  }
+
   async fetchPlayerPerformances(gameId) {
-    //TODO
     const perfs = [];
 
     const url = `https://www.fleaflicker.com/api/FetchLeagueBoxscore?sport=NFL&league_id=${constants.LEAGUE_ID}&fantasy_game_id=${gameId}`;
@@ -94,7 +125,11 @@ function createPlayerPerformance(slot, gameId, teamType, starter) {
       JSON.stringify(player.viewingActualStats)
     );
   } catch (err) {
-    console.error(`Issue processing API request: \n ${err.message} \n ${JSON.stringify(slot)}`);
+    console.error(
+      `Issue processing API request: \n ${err.message} \n ${JSON.stringify(
+        slot
+      )}`
+    );
     return null;
   }
 }
@@ -106,15 +141,15 @@ function shouldSkipProcessing(slot, teamType) {
   }
   const player = slot[teamType],
     proTeam = player.proPlayer.proTeamAbbreviation,
-    isPlayerFreeAgent = proTeam === "FA"
+    isPlayerFreeAgent = proTeam === "FA";
 
-    if(isPlayerFreeAgent) {
-      return true;
-    }
-    const isPlayerBye = player.requestedGames[0].isBye;
-    if( isPlayerBye) {
-      return true;
-    }
+  if (isPlayerFreeAgent) {
+    return true;
+  }
+  const isPlayerBye = player.requestedGames[0].isBye;
+  if (isPlayerBye) {
+    return true;
+  }
 
   return false;
 }
