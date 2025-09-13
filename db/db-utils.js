@@ -7,7 +7,6 @@ function getDbPromise() {
       if (err) {
         return reject(err);
       }
-      // console.log(`Connected to ${constants.DB_PATH}.`);
       resolve(db);
     });
   });

@@ -1,5 +1,5 @@
 import axios from "axios";
-import constants from "../constants.js";
+import constants from "../../constants.js";
 import Game from "../models/game.js";
 import Team from "../models/team.js";
 import PlayerPerformance from "../models/player-performance.js";
