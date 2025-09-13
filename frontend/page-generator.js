@@ -7,10 +7,10 @@ const templateLocation = "./frontend/templates/index.pug",
   html = pug.renderFile(templateLocation);
 
 // Write the HTML string to a new file
-fs.writeFile("index.html", html, (err) => {
+fs.writeFile("./public/index.html", html, (err) => {
   if (err) {
     console.error("Error writing file:", err);
   } else {
-    console.log("index.html created successfully!");
+    console.log("index.html created successfully in public folder!");
   }
 });
