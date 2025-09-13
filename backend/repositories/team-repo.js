@@ -2,7 +2,7 @@ import {
   getDbPromise,
   getAllPromise,
   getCloseDbPromise,
-} from "../db/db-utils.js";
+} from "../../db/db-utils.js";
 import Team from "../models/team.js";
  class TeamRepo {
   constructor() {}
