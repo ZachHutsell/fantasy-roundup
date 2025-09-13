@@ -7,45 +7,27 @@ import teamRepo from "./repositories/team-repo.js";
 import playerRepo from "./repositories/player-repo.js";
 import playerPerformanceRepo from "./repositories/player-performance-repo.js";
 import fleaflickerApi from "./api/fleaflicker-api.js";
-
-const weeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
-
-const args = {
-  func: {
-    index: 2,
-    vals: {
-      loadPlayers: "PLAYERS",
-      loadTeams: "TEAMS",
-      loadWeekly: "WEEK",
-    },
-  },
-  season: {
-    index: 3,
-  },
-  week: {
-    index: 4,
-  },
-};
+import constants from "../constants.js";
 
 async function main() {
-  const func = process.argv[args.func.index],
-    season = process.argv[args.season.index],
-    week = process.argv[args.week.index];
+  const func = process.argv[constants.PROG_ARGS.load.func.index],
+    season = process.argv[constants.PROG_ARGS.load.season.index],
+    week = process.argv[constants.PROG_ARGS.load.week.index];
 
   switch (func) {
-    case args.func.vals.loadPlayers:
+    case constants.PROG_ARGS.load.func.vals.loadPlayers:
       await loadPlayersToDb();
       break;
-    case args.func.vals.loadTeams:
-      if(!season) {
-        console.error('Cannot load teams without season');
+    case constants.PROG_ARGS.load.func.vals.loadTeams:
+      if (!season) {
+        console.error("Cannot load teams without season");
         break;
       }
       await loadTeamsToDb(season);
       break;
-    case args.func.vals.loadWeekly:
-      if(!(season && week)) {
-        console.error('Cannot load games without season and week');
+    case constants.PROG_ARGS.load.func.vals.loadWeekly:
+      if (!(season && week)) {
+        console.error("Cannot load games without season and week");
         break;
       }
       await loadWeekly(season, week);
