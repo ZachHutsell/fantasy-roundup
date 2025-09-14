@@ -2,12 +2,12 @@
 //Add some logging library
 //Typescript?
 import _ from "lodash";
-import gameRepo from "./repositories/game-repo.js";
-import teamRepo from "./repositories/team-repo.js";
-import playerRepo from "./repositories/player-repo.js";
-import playerPerformanceRepo from "./repositories/player-performance-repo.js";
-import fleaflickerApi from "./api/fleaflicker-api.js";
-import constants from "../constants.js";
+import gameRepo from "../common/repositories/game-repo.js";
+import teamRepo from "../common/repositories/team-repo.js";
+import playerRepo from "../common/repositories/player-repo.js";
+import playerPerformanceRepo from "../common/repositories/player-performance-repo.js";
+import fleaflickerApi from "./fleaflicker-api.js";
+import constants from "../../constants.js";
 
 async function main() {
   const func = process.argv[constants.PROG_ARGS.load.func.index],

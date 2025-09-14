@@ -1,9 +1,9 @@
 import axios from "axios";
 import constants from "../../constants.js";
-import Game from "../models/game.js";
-import Team from "../models/team.js";
-import PlayerPerformance from "../models/player-performance.js";
-import Player from "../models/player.js";
+import Game from "../common/models/game.js";
+import Team from "../common/models/team.js";
+import PlayerPerformance from "../common/models/player-performance.js";
+import Player from "../common/models/player.js";
 
 class FleaflickerApi {
   constructor() {}

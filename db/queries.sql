@@ -1,49 +1,39 @@
---POINTS BY RBs
-select
-	t.name as team,
-	SUM(pp.points) as pointsByRbs
-from
-	player_performances pp
-join teams t on
-	t.id = pp.team_id
-where
-	 pp.starter = 1
-	and pp.position = 'RB'
-group by
-	pp.team_id
-order by
-	pointsByRbs desc;
-
---POINTS BY WRs
-select
-	t.name as team,
-	SUM(pp.points) as pointsByWrs
-from
-	player_performances pp
-join teams t on
-	t.id = pp.team_id
-where
-	 pp.starter = 1
-	and pp.position = 'WR'
-group by
-	pp.team_id
-order by
-	pointsByWrs desc;
+--POINTS BY POSITION GROUP
+ SELECT
+            t.name AS Team,
+            ROUND(SUM(pp.points), 1) AS Points_By_Position
+        FROM
+            player_performances pp
+        JOIN teams t ON
+            t.id = pp.team_id
+        JOIN games g ON
+            g.id = pp.game_id
+        WHERE
+            pp.starter = 1
+            AND pp.position = :positionGroup
+            AND g.week = :week
+        GROUP BY
+            pp.team_id
+        ORDER BY
+            Points_By_Position DESC;
 
 --POINTS ON BENCH
-select
-	t.name as team,
-	SUM(pp.points) as pointsOnBench
-from
+SELECT
+	t.name as Team,
+	SUM(pp.points) as Points_On_Bench
+FROM
 	player_performances pp
-join teams t on
+JOIN teams t ON
 	t.id = pp.team_id
-where
+JOIN games g ON
+	g.id = pp.game_id
+	AND g.week = :week
+WHERE
 	 pp.starter = 0
-group by
+GROUP BY
 	pp.team_id
-order by
-	pointsOnBench desc;
+ORDER BY
+	Points_On_Bench DESC;
 
 --WEEKLY RANKS
 WITH draft_ranks AS (
@@ -81,21 +71,20 @@ JOIN teams t ON
 WHERE
 	p."position" = :position
 	AND pp.points IS NOT NULL
-	AND g.season = :season
 	AND g.week = :week
 )
 SELECT
-	p.name player_name,
-	wr.points,
-	wr.team_name,
-	CASE wr.starter WHEN 1 THEN 'Yes' ELSE 'No' END AS started,
-	COALESCE(dr.rank, 0) AS draft_rank,
-	wr.rank AS weekly_rank,
+	p.name Player_Name,
+	wr.points Points_Scored,
+	wr.team_name TEAM,
+	CASE wr.starter WHEN 1 THEN 'Yes' ELSE 'No' END AS Starter,
+	COALESCE(dr.rank, 0) AS Draft_Rank,
+	wr.rank AS Weekly_Rank,
 	CASE
 		dr.rank
 WHEN NULL THEN 'N/A'
 		ELSE COALESCE(dr.rank, wr.rank) - wr.rank
-	END AS performance_rank_over_draft
+	END AS Value_Over_Draft
 FROM
 	weekly_ranks wr
 JOIN players p ON
@@ -103,4 +92,4 @@ JOIN players p ON
 LEFT JOIN draft_ranks dr ON
 	dr.player_id = wr.player_id
 ORDER BY
-	weekly_rank;
+	Weekly_Rank;
