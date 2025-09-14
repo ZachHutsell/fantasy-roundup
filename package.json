@@ -5,9 +5,9 @@
   "description": "Run 'npm run load 2024 2' to populate data for week 2 of 2024 season",
   "main": "load.js",
   "scripts": {
-    "setup": "node ./db/setup.js",
-    "load": "node ./load/load.js",
-    "show": "node ./show/show.js"
+    "setup": "node ./apps/setup.js",
+    "load": "node ./apps/load/load.js",
+    "show": "node ./apps/show/show.js"
   },
   "author": "",
   "license": "ISC",

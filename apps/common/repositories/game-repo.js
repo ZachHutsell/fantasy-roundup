@@ -3,7 +3,7 @@ import {
   getDbPromise,
   getAllPromise,
   getCloseDbPromise,
-} from "../../db/db-utils.js";
+} from "../db-utils.js";
 
 class GameRepo {
   constructor() {}

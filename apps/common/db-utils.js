@@ -1,5 +1,5 @@
 import sqlite3 from "sqlite3";
-import constants from "../constants.js";
+import constants from "../../constants.js";
 
 function getDbPromise() {
   return new Promise((resolve, reject) => {
