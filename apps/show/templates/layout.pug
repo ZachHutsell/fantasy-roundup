@@ -18,24 +18,24 @@ html(lang="en")
         title Week #{weekNum} Stats
     body
         div(class='container')
-        h1(class='display-4') Week #{weekNum}
-        p(class='lead') Total points scored by starting RBs for each team
-        +custom-table(teamRbsHeaders, teamRbs)
-        br
-        p(class='lead') Total points scored by starting WRs for each team
-        +custom-table(teamWrsHeaders, teamWrs)
-        br
-        p(class='lead') Total points scored by players on bench for each team
-        +custom-table(teamBenchHeaders, teamBench)
-        br
-        p(class='lead') Week #{weekNum} QB rankings
-        +custom-table(qbRanksHeaders, qbRanks)
-        br
-        p(class='lead') Week #{weekNum} WR rankings
-        +custom-table(wrRanksHeaders, wrRanks)
-        br
-        p(class='lead') Week #{weekNum} RB rankings
-        +custom-table(rbRanksHeaders, rbRanks)
-        br
-        p(class='lead') Week #{weekNum} TE rankings
-        +custom-table(teRanksHeaders, teRanks)
+            h1(class='display-4') Week #{weekNum}
+            p(class='lead') Total points scored by starting RBs for each team
+            +custom-table(teamRbsHeaders, teamRbs)
+            br
+            p(class='lead') Total points scored by starting WRs for each team
+            +custom-table(teamWrsHeaders, teamWrs)
+            br
+            p(class='lead') Total points scored by players on bench for each team
+            +custom-table(teamBenchHeaders, teamBench)
+            br
+            p(class='lead') Week #{weekNum} QB rankings
+            +custom-table(qbRanksHeaders, qbRanks)
+            br
+            p(class='lead') Week #{weekNum} WR rankings
+            +custom-table(wrRanksHeaders, wrRanks)
+            br
+            p(class='lead') Week #{weekNum} RB rankings
+            +custom-table(rbRanksHeaders, rbRanks)
+            br
+            p(class='lead') Week #{weekNum} TE rankings
+            +custom-table(teRanksHeaders, teRanks)
