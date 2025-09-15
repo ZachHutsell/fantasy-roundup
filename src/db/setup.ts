@@ -8,6 +8,7 @@ let db = new sqlite3.Database(constants.DB_PATH, (err) => {
   console.log(`Connected to ${constants.DB_PATH}.`);
 });
 
+//Create tables
 db.serialize(() => {
   //draft board
   db.run(`
@@ -50,8 +51,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY,
       name TEXT,
       position TEXT,
-      pro_team TEXT,
-      sportradar_id
+      pro_team TEXT
     );
   `);
 
@@ -74,11 +74,20 @@ db.serialize(() => {
   `);
 });
 
-db.serialize(() => {
-  db.run('DELETE FROM PLAYERS');
-})
+// Create triggers
+db.serialize(() =>{
+  db.run(`
+    CREATE TRIGGER IF NOT EXISTS update_players
+    BEFORE INSERT ON player_performances
+    BEGIN
+      INSERT INTO players (id, name, position, pro_team)
+      VALUES (NEW.player_id, NEW.player_name, NEW.position, NEW.pro_team)
+      ON CONFLICT (id) DO UPDATE SEt pro_team = EXCLUDED.pro_team;
+    END;
+    `);
+});
 
-//Manual Inserts
+//Draft board inserts 
 db.serialize(() => {
   db.run(`DELETE FROM draft_board`);
   db.run(`INSERT INTO draft_board VALUES(1,1,1,16250,1203346)`);
@@ -274,6 +283,15 @@ db.serialize(() => {
   db.run(`INSERT INTO draft_board VALUES(191,16,11,15412,746602)`);
   db.run(`INSERT INTO draft_board VALUES(192,16,12,12347,1203346)`);
 });
+
+//DO NOT COMMIT
+db.run(`
+  DELETE FROM player_performances;
+  `);
+
+  db.run(`
+  DELETE FROM players;
+  `);
 
 db.close((err) => {
   if (err) {

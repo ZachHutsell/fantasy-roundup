@@ -23,8 +23,11 @@ import Team from "../models/team.js";
     const db = await getDbPromise();
 
     await db.serialize(() => {
-      const stmt = db.prepare(//TODO definitely need to update when team already exists, or delete and re-insert
-        "INSERT OR IGNORE INTO teams (id, season, name, points_for, points_against) VALUES (?, ?, ?, ?, ?)",
+      const stmt = db.prepare(
+        `
+        INSERT INTO teams (id, season, name, points_for, points_against) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT (id) DO UPDATE SET points_for=excluded.points_for, points_against=excluded.points_against
+        `,
       );
 
       teams.forEach((team) => {
@@ -33,7 +36,7 @@ import Team from "../models/team.js";
 
       stmt.finalize();
 
-      console.log(`${teams.length} teams inserted`);
+      console.log(`${teams.length} teams inserted or updated`);
     });
 
     await getCloseDbPromise(db);

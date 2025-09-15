@@ -3,7 +3,6 @@ import constants from "../common/constants.js";
 import Game from "../common/models/game.js";
 import Team from "../common/models/team.js";
 import PlayerPerformance from "../common/models/player-performance.js";
-import Player from "../common/models/player.js";
 
 class FleaflickerApi {
   constructor() {}
@@ -36,37 +35,6 @@ class FleaflickerApi {
         team.pointsAgainst.value
       );
     });
-  }
-
-  async fetchPlayers(pageLimit: number): Promise<Player[]> {
-    let resultOffset = 0,
-      pageCount = 0,
-      players: Player[] = [];
-
-    while (
-      resultOffset != null &&
-      (pageLimit == null || pageCount < pageLimit)
-    ) {
-      const url = `https://www.fleaflicker.com/api/FetchPlayerListing?sport=NFL&league_id=${constants.LEAGUE_ID}&external_id_type=SPORTRADAR&result_offset=${resultOffset}`;
-      const data = await fetch(url);
-
-      resultOffset = data.resultOffsetNext;
-      pageCount++;
-
-      data.players.forEach((player: any) => {
-        const pp = player.proPlayer;
-        players.push(
-          new Player(
-            pp.id,
-            pp.nameShort,
-            pp.position,
-            pp.proTeamAbbreviation,
-            pp.externalIds ? pp.externalIds[0].id : null
-          )
-        );
-      });
-    }
-    return players;
   }
 
   async fetchPlayerPerformances(gameId: number): Promise<PlayerPerformance[]> {

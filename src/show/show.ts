@@ -6,13 +6,14 @@ import constants from "../common/constants.js";
 const templateLocation = "./src/show/templates/layout.pug";
 
 async function main() {
-  const week = process.argv[constants.PROG_ARGS.show.week.index];
+  const week = constants.WEEK;
+
   if (!week) {
     console.error("Cannot generate page without week");
     return;
   }
 
-  const html = await renderLayout(+week),
+  const html = await renderLayout(week),
     location = getRenderLocation(week);
 
   writeFile(location, html);
@@ -79,7 +80,7 @@ function writeFile(location: string, html: string) {
   });
 }
 
-function getRenderLocation(week: string): string {
+function getRenderLocation(week: number): string {
   return `./docs/weeks/${week}.html`;
 }
 

@@ -6,16 +6,14 @@
   "main": "load.js",
   "scripts": {
     "build": "rimraf dist && tsc && copyfiles -u 3 src/show/templates/*.pug dist/templates",
-    "setup": "node ./dist/db/setup.js",
-    "load-players": "node ./dist/load/load.js PLAYERS",
-    "load-teams":"node ./dist/load/load.js TEAMS",
-    "load-week": "node ./dist/load/load.js WEEK",
-    "compile-html": "node dist/show/show.js",
-    "compile-html-dev": "npm run ts-build && node dist/show/show.js"
+    "setup": "npm run build && node ./dist/db/setup.js",
+    "load-week": "npm run build && node ./dist/load/load.js WEEK",
+    "compile-html": "npm run build && node dist/show/show.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@camfleety/nfl-data-js": "^1.0.0",
     "@types/lodash": "^4.17.20",
     "@types/node": "^24.4.0",
     "@types/pug": "^2.0.10",
