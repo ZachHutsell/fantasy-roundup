@@ -1,7 +1,7 @@
-import sqlite3 from "sqlite3";
-import constants from "../../constants.js";
+import sqlite3, {type Database, type RunResult } from "sqlite3";
+import constants from "./constants.js";
 
-function getDbPromise() {
+function getDbPromise(): Promise<Database> {
   return new Promise((resolve, reject) => {
     let db = new sqlite3.Database(constants.DB_PATH, (err) => {
       if (err) {
@@ -12,9 +12,9 @@ function getDbPromise() {
   });
 }
 
-function getAllPromise(db, sql, params = []) {
+function getAllPromise(db: Database, sql: string, params: object | any[] = []): Promise<any[]> {
   return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
+    db.all(sql, params, (err: any, rows: any[]) => {
       if (err) {
         return reject(err);
       }
@@ -23,7 +23,7 @@ function getAllPromise(db, sql, params = []) {
   });
 }
 
-function getCloseDbPromise(db) {
+function getCloseDbPromise(db: Database): Promise<void> {
   return new Promise((resolve, reject) => {
     db.close((err) => {
       if (err) {
@@ -35,7 +35,7 @@ function getCloseDbPromise(db) {
   });
 }
 
-function getRunPromise(db, sql, params = []) {
+function getRunPromise(db: Database, sql: string, params = []): Promise<RunResult> {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) {

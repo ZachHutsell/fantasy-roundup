@@ -1,5 +1,5 @@
 import sqlite3 from "sqlite3";
-import constants from "../constants.js";
+import constants from "../common/constants.js";
 
 let db = new sqlite3.Database(constants.DB_PATH, (err) => {
   if (err) {
@@ -73,6 +73,10 @@ db.serialize(() => {
     );
   `);
 });
+
+db.serialize(() => {
+  db.run('DELETE FROM PLAYERS');
+})
 
 //Manual Inserts
 db.serialize(() => {

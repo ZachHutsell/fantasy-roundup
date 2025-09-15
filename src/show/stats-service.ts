@@ -1,17 +1,28 @@
-import { getDbPromise, getAllPromise, getCloseDbPromise } from "../common/db-utils.js";
+import type { Database } from "sqlite3";
+import {
+  getDbPromise,
+  getAllPromise,
+  getCloseDbPromise,
+} from "../common/db-utils.js";
+import type {
+  PlayerPositionGroupRankingsResult,
+  TeamPointsResult,
+} from "./interfaces.js";
 
-//{team, pointsByPosition}
 class StatsService {
   constructor() {}
 
-  async getTeamPositionGroupStrengthByWeek(week, positionGroup) {
-    const db = await getDbPromise();
+  async getTeamPositionGroupStrengthByWeek(
+    week: number,
+    positionGroup: string
+  ): Promise<TeamPointsResult[]> {
+    const db: Database = await getDbPromise();
     const rows = await getAllPromise(
       db,
       `
         SELECT
-            t.name AS Team,
-            ROUND(SUM(pp.points), 1) AS Points_By_Position
+            t.name AS team,
+            ROUND(SUM(pp.points), 1) AS points
         FROM
             player_performances pp
         JOIN teams t ON
@@ -25,22 +36,22 @@ class StatsService {
         GROUP BY
             pp.team_id
         ORDER BY
-            Points_By_Position DESC
+            points DESC
       `,
-      {':positionGroup': positionGroup, ':week': week}
+      { ":positionGroup": positionGroup, ":week": week }
     );
     await getCloseDbPromise(db);
     return rows;
   }
 
-  async getTeamPointsOnBenchByWeek(week) {
+  async getTeamPointsOnBenchByWeek(week: number): Promise<TeamPointsResult[]> {
     const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
       `
         SELECT
-            t.name as Team,
-            ROUND(SUM(pp.points), 1) as Points_On_Bench
+            t.name as team,
+            ROUND(SUM(pp.points), 1) as points
         FROM
             player_performances pp
         JOIN teams t ON
@@ -53,7 +64,7 @@ class StatsService {
         GROUP BY
             pp.team_id
         ORDER BY
-            Points_On_Bench DESC
+            points DESC
       `,
       [week]
     );
@@ -61,8 +72,11 @@ class StatsService {
     return rows;
   }
 
-  async getPositionGroupRankingsByWeek(week, positionGroup) {
-     const db = await getDbPromise();
+  async getPositionGroupRankingsByWeek(
+    week: number,
+    positionGroup: string
+  ): Promise<PlayerPositionGroupRankingsResult[]> {
+    const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
       `
@@ -104,17 +118,17 @@ class StatsService {
             AND g.week = :week
         )
         SELECT
-            p.name Player_Name,
-            wr.points Points_Scored,
-            wr.team_name Team,
-            CASE wr.starter WHEN 1 THEN 'Yes' ELSE 'No' END AS Starter,
-            COALESCE(dr.rank, 0) AS Draft_Rank,
-            wr.rank AS Weekly_Rank,
+            p.name player,
+            wr.points points,
+            wr.team_name team,
+            CASE wr.starter WHEN 1 THEN 'Yes' ELSE 'No' END AS starter,
+            COALESCE(dr.rank, 0) AS draftRank,
+            wr.rank AS weeklyRank,
             CASE
                 dr.rank
                 WHEN NULL THEN 'N/A'
                 ELSE COALESCE(dr.rank, wr.rank) - wr.rank
-                END AS Value_Over_Draft
+                END AS valueOverDraft
             FROM
                 weekly_ranks wr
             JOIN players p ON
@@ -122,9 +136,9 @@ class StatsService {
             LEFT JOIN draft_ranks dr ON
                 dr.player_id = wr.player_id
             ORDER BY
-                Weekly_Rank
+                weeklyRank
       `,
-      {':positionGroup': positionGroup, ':week': week}
+      { ":positionGroup": positionGroup, ":week": week }
     );
     await getCloseDbPromise(db);
     return rows;

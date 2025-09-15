@@ -4,10 +4,11 @@ import {
   getCloseDbPromise,
 } from "../db-utils.js";
 import Team from "../models/team.js";
+
  class TeamRepo {
   constructor() {}
 
-  async findBySeason(season) {
+  async findBySeason(season: number): Promise<Team[]> {
     const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
@@ -18,7 +19,7 @@ import Team from "../models/team.js";
     return rows.map(mapRow);
   }
 
-  async batchInsert(teams) {
+  async batchInsert(teams: Team[]) {
     const db = await getDbPromise();
 
     await db.serialize(() => {
@@ -39,7 +40,7 @@ import Team from "../models/team.js";
   }
 }
 
-  function mapRow(row) {
+  function mapRow(row: any): Team {
     return new Team(row.id, row.season, row.name, row.points_for, row.points_against);
   }
 

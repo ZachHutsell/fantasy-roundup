@@ -9,7 +9,7 @@ import PlayerPerformance from "../models/player-performance.js";
 class PlayerPerformanceRepo {
   constructor() {}
 
-  async findByGame(gameId) {
+  async findByGame(gameId: number): Promise<PlayerPerformance[]> {
     const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
@@ -20,7 +20,7 @@ class PlayerPerformanceRepo {
     return rows.map(mapRow);
   }
 
-  async batchInsert(performances) {
+  async batchInsert(performances: PlayerPerformance[]) {
     const db = await getDbPromise();
 
     try {
@@ -59,7 +59,7 @@ class PlayerPerformanceRepo {
   }
 }
 
-function mapRow(row) {
+function mapRow(row: any): PlayerPerformance {
   return new PlayerPerformance(
     row.game_id,
     row.player_id,

@@ -7,12 +7,13 @@ import teamRepo from "../common/repositories/team-repo.js";
 import playerRepo from "../common/repositories/player-repo.js";
 import playerPerformanceRepo from "../common/repositories/player-performance-repo.js";
 import fleaflickerApi from "./fleaflicker-api.js";
-import constants from "../../constants.js";
+import constants from "../common/constants.js";
+import type Game from "../common/models/game.js";
 
 async function main() {
   const func = process.argv[constants.PROG_ARGS.load.func.index],
-    season = process.argv[constants.PROG_ARGS.load.season.index],
-    week = process.argv[constants.PROG_ARGS.load.week.index];
+    season = castToNumber(process.argv[constants.PROG_ARGS.load.season.index]),
+    week = castToNumber(process.argv[constants.PROG_ARGS.load.week.index]);
 
   switch (func) {
     case constants.PROG_ARGS.load.func.vals.loadPlayers:
@@ -37,18 +38,25 @@ async function main() {
   }
 }
 
-async function loadWeekly(season, week) {
+function castToNumber(val: string | undefined): number | null {
+  if (val!= undefined) {
+    return +val;
+  }
+  return null;
+}
+
+async function loadWeekly(season: number, week: number) {
   await loadGamesToDb(season, week);
   await loadPlayerPerformancesToDb(season, week);
 }
 
 //WARNING, THIS WILL CLEAR PLAYERS TABLE AND RELOAD IT!
-async function loadPlayersToDb() {
-  const players = await fleaflickerApi.fetchPlayers();
-  await playerRepo.clearAndBatchInsert(players);
+async function loadPlayersToDb(): Promise<void> {
+  const players = await fleaflickerApi.fetchPlayers(100);
+  await playerRepo.batchInsert(players);
 }
 
-async function loadTeamsToDb(season) {
+async function loadTeamsToDb(season: number): Promise<void> {
   const existingTeams = await teamRepo.findBySeason(season);
   if (existingTeams.length >= 12) {
     console.log(`Teams already loaded for season ${season}`);
@@ -58,7 +66,7 @@ async function loadTeamsToDb(season) {
   await teamRepo.batchInsert(teams);
 }
 
-async function loadGamesToDb(season, week) {
+async function loadGamesToDb(season: number, week: number): Promise<void> {
   const existingGames = await gameRepo.findByWeek(season, week);
   if (gamesLoadedForWeek(existingGames)) {
     console.log(`Games already loaded for season ${season} week ${week}`);
@@ -68,7 +76,7 @@ async function loadGamesToDb(season, week) {
   await gameRepo.batchInsert(games);
 }
 
-async function loadPlayerPerformancesToDb(season, week) {
+async function loadPlayerPerformancesToDb(season: number, week:number): Promise<void> {
   const games = await gameRepo.findByWeek(season, week);
   if (!gamesLoadedForWeek(games)) {
     console.error(`Games not loaded for ${season} week ${week}`);
@@ -87,7 +95,7 @@ async function loadPlayerPerformancesToDb(season, week) {
   }
 }
 
-function gamesLoadedForWeek(games) {
+function gamesLoadedForWeek(games: Game[]): boolean {
   return games.length === 6;
 }
 
