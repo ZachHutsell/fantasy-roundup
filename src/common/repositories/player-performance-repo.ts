@@ -26,7 +26,7 @@ class PlayerPerformanceRepo {
     try {
       await db.serialize(() => {
         const stmt = db.prepare(
-          "INSERT INTO player_performances " +
+          "INSERT OR IGNORE INTO player_performances " +
             "(game_id, player_id, team_id, starter, player_name, position, pro_team, points, stats) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );

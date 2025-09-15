@@ -23,8 +23,8 @@ import Team from "../models/team.js";
     const db = await getDbPromise();
 
     await db.serialize(() => {
-      const stmt = db.prepare(
-        "INSERT INTO teams (id, season, name, points_for, points_against) VALUES (?, ?, ?, ?, ?)",
+      const stmt = db.prepare(//TODO definitely need to update when team already exists, or delete and re-insert
+        "INSERT OR IGNORE INTO teams (id, season, name, points_for, points_against) VALUES (?, ?, ?, ?, ?)",
       );
 
       teams.forEach((team) => {
