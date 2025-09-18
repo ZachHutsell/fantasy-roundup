@@ -7,38 +7,55 @@ import {
 import type {
   PlayerPositionGroupRankingsResult,
   TeamPointsResult,
+  TeamPositionGroupPointsResult,
 } from "./interfaces.js";
 
 class StatsService {
   constructor() {}
 
-  async getTeamPositionGroupStrengthByWeek(
-    week: number,
-    positionGroup: string
-  ): Promise<TeamPointsResult[]> {
-    const db: Database = await getDbPromise();
+  async getTeamPositionGroupPointsByWeek(
+    week: number
+  ): Promise<TeamPositionGroupPointsResult[]> {
+    const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
       `
+        WITH team_points_by_position AS (
+            SELECT
+                t.name AS team_name,
+                ROUND(SUM(CASE WHEN pp.position = 'QB' THEN pp.points ELSE 0 END), 2) AS qb_points,
+                ROUND(SUM(CASE WHEN pp.position = 'WR' THEN pp.points ELSE 0 END), 2) AS wr_points,
+                ROUND(SUM(CASE WHEN pp.position = 'RB' THEN pp.points ELSE 0 END), 2) AS rb_points,
+                ROUND(SUM(CASE WHEN pp.position = 'TE' THEN pp.points ELSE 0 END), 2) AS te_points,
+                ROUND(SUM(CASE WHEN pp.position = 'K' THEN pp.points ELSE 0 END), 2) AS k_points,
+                ROUND(SUM(CASE WHEN pp.position = 'D/ST' THEN pp.points ELSE 0 END), 2) AS dst_points
+            FROM
+                player_performances pp
+            JOIN teams t ON
+                t.id = pp.team_id
+            JOIN games g ON
+                g.id = pp.game_id
+            WHERE
+                pp.starter = 1
+                AND g.week = ?
+            GROUP BY
+                t.id,
+                t.name)
         SELECT
-            t.name AS team,
-            ROUND(SUM(pp.points), 1) AS points
+            team_name AS team,
+            qb_points AS qbPoints,
+            wr_points AS wrPoints,
+            rb_points AS rbPoints,
+            te_points AS tePoints,
+            k_points AS kPoints,
+            dst_points AS dstPoints,
+            ROUND(qb_points + wr_points + rb_points + te_points + k_points + dst_points, 2) AS totalPoints
         FROM
-            player_performances pp
-        JOIN teams t ON
-            t.id = pp.team_id
-        JOIN games g ON
-            g.id = pp.game_id
-        WHERE
-            pp.starter = 1
-            AND pp.position = :positionGroup
-            AND g.week = :week
-        GROUP BY
-            pp.team_id
+            team_points_by_position
         ORDER BY
-            points DESC
+            totalPoints DESC
       `,
-      { ":positionGroup": positionGroup, ":week": week }
+      [week]
     );
     await getCloseDbPromise(db);
     return rows;

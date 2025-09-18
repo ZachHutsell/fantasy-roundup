@@ -35,17 +35,15 @@ async function loadGamesToDb(season: number, week: number): Promise<void> {
   await gameRepo.batchInsert(games);
 }
 
-async function loadPlayerPerformancesToDb(season: number, week:number): Promise<void> {
+async function loadPlayerPerformancesToDb(
+  season: number,
+  week: number
+): Promise<void> {
   const games = await gameRepo.findByWeek(season, week);
   const gameIds = games.map((game) => game.id);
   for (const gameId of gameIds) {
-    const existingPerformances = await playerPerformanceRepo.findByGame(gameId);
-    if (existingPerformances.length > 0) {
-      console.log(`Performances already loaded for game ${gameId}`);
-    } else {
-      const perfs = await fleaflickerApi.fetchPlayerPerformances(gameId);
-      await playerPerformanceRepo.batchInsert(perfs);
-    }
+    const perfs = await fleaflickerApi.fetchPlayerPerformances(gameId);
+    await playerPerformanceRepo.batchInsert(perfs);
   }
 }
 
