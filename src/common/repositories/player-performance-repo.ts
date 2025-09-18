@@ -9,7 +9,7 @@ import PlayerPerformance from "../models/player-performance.js";
 class PlayerPerformanceRepo {
   constructor() {}
 
-  async findByGame(gameId) {
+  async findByGame(gameId: number): Promise<PlayerPerformance[]> {
     const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
@@ -20,13 +20,13 @@ class PlayerPerformanceRepo {
     return rows.map(mapRow);
   }
 
-  async batchInsert(performances) {
+  async batchInsert(performances: PlayerPerformance[]) {
     const db = await getDbPromise();
 
     try {
       await db.serialize(() => {
         const stmt = db.prepare(
-          "INSERT INTO player_performances " +
+          "INSERT OR IGNORE INTO player_performances " +
             "(game_id, player_id, team_id, starter, player_name, position, pro_team, points, stats) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
@@ -59,7 +59,7 @@ class PlayerPerformanceRepo {
   }
 }
 
-function mapRow(row) {
+function mapRow(row: any): PlayerPerformance {
   return new PlayerPerformance(
     row.game_id,
     row.player_id,

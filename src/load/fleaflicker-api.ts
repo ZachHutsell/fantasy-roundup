@@ -1,17 +1,16 @@
 import axios from "axios";
-import constants from "../../constants.js";
+import constants from "../common/constants.js";
 import Game from "../common/models/game.js";
 import Team from "../common/models/team.js";
 import PlayerPerformance from "../common/models/player-performance.js";
-import Player from "../common/models/player.js";
 
 class FleaflickerApi {
   constructor() {}
 
-  async fetchGames(season, week) {
+  async fetchGames(season: number, week: number): Promise<Game[]> {
     const url = `https://www.fleaflicker.com/api/FetchLeagueScoreboard?sport=NFL&league_id=${constants.LEAGUE_ID}&season=${season}&scoring_period=${week}`;
     const data = await fetch(url);
-    return data.games.map((game) => {
+    return data.games.map((game: any) => {
       return new Game(
         game.id,
         season,
@@ -24,10 +23,10 @@ class FleaflickerApi {
     });
   }
 
-  async fetchTeams(season) {
+  async fetchTeams(season: number): Promise<Team[]> {
     const url = `https://www.fleaflicker.com/api/FetchLeagueStandings?sport=NFL&league_id=${constants.LEAGUE_ID}&season=${season}`;
     const data = await fetch(url);
-    return data.divisions[0].teams.map((team) => {
+    return data.divisions[0].teams.map((team: any) => {
       return new Team(
         team.id,
         season,
@@ -38,62 +37,36 @@ class FleaflickerApi {
     });
   }
 
-  async fetchPlayers(pageLimit) {
-    let resultOffset = 0,
-      pageCount = 0,
-      players = [];
-
-    while (
-      resultOffset != null &&
-      (pageLimit == null || pageCount < pageLimit)
-    ) {
-      const url = `https://www.fleaflicker.com/api/FetchPlayerListing?sport=NFL&league_id=${constants.LEAGUE_ID}&external_id_type=SPORTRADAR&result_offset=${resultOffset}`;
-      const data = await fetch(url);
-
-      resultOffset = data.resultOffsetNext;
-      pageCount++;
-
-      data.players.forEach((player) => {
-        const pp = player.proPlayer;
-        players.push(
-          new Player(
-            pp.id,
-            pp.nameShort,
-            pp.position,
-            pp.proTeamAbbreviation,
-            pp.externalIds ? pp.externalIds[0].id : null
-          )
-        );
-      });
-    }
-    return players;
-  }
-
-  async fetchPlayerPerformances(gameId) {
-    const perfs = [];
+  async fetchPlayerPerformances(gameId: number): Promise<PlayerPerformance[]> {
+    const perfs: PlayerPerformance[] = [];
 
     const url = `https://www.fleaflicker.com/api/FetchLeagueBoxscore?sport=NFL&league_id=${constants.LEAGUE_ID}&fantasy_game_id=${gameId}`;
     const data = await fetch(url);
 
-    data.lineups.forEach((lineup) => {
+    data.lineups.forEach((lineup: any) => {
       const starter =
         !!lineup.slots[0].position.group &&
         lineup.slots[0].position.group === "START";
 
-      lineup.slots.forEach((slot) => {
-        const awayPlayer = createPlayerPerformance(
+      lineup.slots.forEach((slot: any) => {
+        const awayPlayer: PlayerPerformance | null = createPlayerPerformance(
           slot,
           gameId,
           "away",
           starter
         );
-        const homePlayer = createPlayerPerformance(
+        const homePlayer: PlayerPerformance | null = createPlayerPerformance(
           slot,
           gameId,
           "home",
           starter
         );
-        perfs.push(awayPlayer, homePlayer);
+        if(!!awayPlayer) {
+          perfs.push(awayPlayer);
+        }
+         if(!!homePlayer) {
+          perfs.push(homePlayer);
+        }
       });
     });
 
@@ -101,13 +74,13 @@ class FleaflickerApi {
   }
 }
 
-async function fetch(url) {
+async function fetch(url: string) {
   console.log(url);
   const response = await axios.get(url);
   return response.data;
 }
 
-function createPlayerPerformance(slot, gameId, teamType, starter) {
+function createPlayerPerformance(slot: any, gameId: number, teamType: string, starter: boolean): PlayerPerformance | null {
   try {
     if (shouldSkipProcessing(slot, teamType)) {
       return null;
@@ -124,7 +97,7 @@ function createPlayerPerformance(slot, gameId, teamType, starter) {
       player.viewingActualPoints.value,
       JSON.stringify(player.viewingActualStats)
     );
-  } catch (err) {
+  } catch (err: any) {
     console.error(
       `Issue processing API request: \n ${err.message} \n ${JSON.stringify(
         slot
@@ -134,7 +107,7 @@ function createPlayerPerformance(slot, gameId, teamType, starter) {
   }
 }
 
-function shouldSkipProcessing(slot, teamType) {
+function shouldSkipProcessing(slot: any, teamType: string) {
   const isInjuredReserve = slot.position.label === "IR";
   if (isInjuredReserve) {
     return true;

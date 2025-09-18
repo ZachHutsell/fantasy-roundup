@@ -8,7 +8,7 @@ import {
 class GameRepo {
   constructor() {}
 
-  async findByWeek(season, week) {
+  async findByWeek(season: number, week: number): Promise<Game[]> {
     const db = await getDbPromise();
     const rows = await getAllPromise(
       db,
@@ -19,11 +19,11 @@ class GameRepo {
     return rows.map(this.mapRow);
   }
 
-  async batchInsert(games) {
+  async batchInsert(games: Game[]): Promise<void> {
     const db = await getDbPromise();
     await db.serialize(() => {
       const stmt = db.prepare(
-        "INSERT INTO games (id, season, week, away_team, home_team, away_score, home_score) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        "INSERT OR IGNORE INTO games (id, season, week, away_team, home_team, away_score, home_score) VALUES (?, ?, ?, ?, ?, ?, ?)"
       );
 
       games.forEach((game) => {
@@ -46,7 +46,7 @@ class GameRepo {
     await getCloseDbPromise(db);
   }
 
-  mapRow(row) {
+  mapRow(row: any): Game {
     return new Game(
       row.id,
       row.season,

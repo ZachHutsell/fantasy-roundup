@@ -5,16 +5,27 @@
   "description": "Run 'npm run load 2024 2' to populate data for week 2 of 2024 season",
   "main": "load.js",
   "scripts": {
-    "setup": "node ./apps/setup.js",
-    "load": "node ./apps/load/load.js",
-    "show": "node ./apps/show/show.js"
+    "build": "rimraf dist && tsc && copyfiles -u 3 src/show/templates/*.pug dist/templates",
+    "setup": "npm run build && node ./dist/db/setup.js",
+    "load-week": "npm run build && node ./dist/load/load.js WEEK",
+    "compile-html": "npm run build && node dist/show/show.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@camfleety/nfl-data-js": "^1.0.0",
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.4.0",
+    "@types/pug": "^2.0.10",
     "axios": "^1.11.0",
     "lodash": "^4.17.21",
     "pug": "^3.0.3",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^6.0.1"
   }
 }
