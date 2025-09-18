@@ -1,12 +1,5 @@
 import nflData from '@camfleety/nfl-data-js';
 
-// Import weekly player stats
-// const weeklyData = await nflData.importWeeklyData([2023]);
-
-// Import team information  
-// const teams = await nflData.importTeamDesc();
-
-// const test = await nflData.importWeeklyData([2026]);
 const test = await nflData.importWeeklyData([2025]);
 
 const arodStats = test.filter(item => {

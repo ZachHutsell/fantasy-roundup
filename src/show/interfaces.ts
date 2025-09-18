@@ -1,25 +1,41 @@
 interface PlayerRankingsResults {
-    playerName: string,
-    pointsScored: number,
-    team: string,
-    starter: string,
-    draftRank: number,
-    weeklyRank: number,
-    valueOverDraft: number
+  playerName: string;
+  pointsScored: number;
+  team: string;
+  starter: string;
+  draftRank: number;
+  weeklyRank: number;
+  valueOverDraft: number;
 }
 
 interface TeamPointsResult {
-    team: string,
-    points: number
+  team: string;
+  points: number;
 }
 
 interface PlayerPositionGroupRankingsResult {
-    player: string,
-    points: number,
-    team: string,
-    starter: string,
-    draftRank: number,
-    weeklyRank: number
-    valueOverDraft: number
+  player: string;
+  points: number;
+  team: string;
+  starter: string;
+  draftRank: number;
+  weeklyRank: number;
+  valueOverDraft: number;
 }
-export type {PlayerRankingsResults, TeamPointsResult, PlayerPositionGroupRankingsResult}
+
+interface TeamPositionGroupPointsResult {
+  team: string;
+  qbPoints: number;
+  wrPoints: number;
+  rbPoints: number;
+  tePoints: number;
+  kPoints: number;
+  dstPoints: number;
+  totalPoints: number;
+}
+export type {
+  PlayerRankingsResults,
+  TeamPointsResult,
+  PlayerPositionGroupRankingsResult,
+  TeamPositionGroupPointsResult,
+};

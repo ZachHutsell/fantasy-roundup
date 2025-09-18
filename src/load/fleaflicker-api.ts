@@ -61,6 +61,9 @@ class FleaflickerApi {
           "home",
           starter
         );
+        if(awayPlayer?.playerId == 2354 || homePlayer?.playerId == 2354) {
+          console.log('seahawks!');//todo remove
+        }
         if(!!awayPlayer) {
           perfs.push(awayPlayer);
         }
